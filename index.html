@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WØRK HΛRD - Premium Routine</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #07050a;
+            --panel-bg: rgba(15, 12, 22, 0.85);
+            --accent-purple: #a78bfa;
+            --accent-red: #ef4444;
+            --accent-gold: #fbbf24;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border-color: rgba(239, 68, 68, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* FULLSCREEN VIDEO BACKGROUND IMPLEMENTATION */
+        .video-bg-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .video-bg-container video {
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: cover;
+            transform: scale(1.05); 
+            transform-origin: center center;
+        }
+
+        /* DARK OVERLAY FOR TEXT READABILITY */
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(7, 5, 10, 0.8) 0%, rgba(15, 8, 20, 0.85) 100%);
+            z-index: -1;
+        }
+
+        /* KIRISH EKRANI */
+        #auth-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            backdrop-filter: blur(25px);
+            background: rgba(7, 5, 10, 0.95);
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .auth-card {
+            background: var(--panel-bg);
+            padding: 3rem 2.5rem;
+            border-radius: 24px;
+            border: 1px solid var(--border-color);
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        }
+
+        .auth-icon {
+            font-size: 3.5rem;
+            color: var(--accent-red);
+            margin-bottom: 1.2rem;
+            animation: pulse 1.8s infinite;
+            text-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.04); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.9; }
+        }
+
+        .auth-title {
+            font-size: 2.6rem;
+            font-weight: 900;
+            margin-bottom: 0.6rem;
+            letter-spacing: 4px;
+            color: #fff;
+        }
+
+        .auth-subtitle {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            line-height: 1.4;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 1.8rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 1.1rem 1.5rem;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .input-group input:focus {
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 20px rgba(167, 139, 250, 0.25);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 1.1rem;
+            background: linear-gradient(90deg, #ef4444, #7c3aed);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(124, 58, 237, 0.5);
+        }
+
+        /* ASOSIY PANEL (DASHBOARD) */
+        .app-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2.5rem 1rem;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: var(--panel-bg);
+            padding: 1.2rem 2rem;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #ef4444, #7c3aed);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .analytics-card {
+            background: var(--panel-bg);
+            border-radius: 24px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 2.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .progress-circle-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .progress-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            position: absolute;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .stat-box {
+            background: rgba(0,0,0,0.3);
+            padding: 1.1rem;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.02);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-number {
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .creator-section {
+            background: var(--panel-bg);
+            padding: 1.5rem;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .task-input-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .task-input-row input {
+            flex-grow: 1;
+            padding: 1.1rem;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            color: white;
+            outline: none;
+            font-size: 0.95rem;
+        }
+
+        .select-category {
+            padding: 1.1rem;
+            background: #0f0c16;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            color: white;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .btn-add {
+            padding: 0 1.8rem;
+            background: linear-gradient(135deg, #ef4444, #7c3aed);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 0.6rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-btn {
+            padding: 0.6rem 1.4rem;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid transparent;
+            border-radius: 22px;
+            color: var(--text-muted);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn.active {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: var(--accent-red);
+            color: white;
+        }
+
+        .tasks-grid {
+            background: var(--panel-bg);
+            border-radius: 24px;
+            padding: 1.8rem;
+            border: 1px solid var(--border-color);
+            min-height: 220px;
+            backdrop-filter: blur(10px);
+        }
+
+        .grid-title {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-transform: uppercase;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.1rem;
+            background: rgba(0,0,0,0.4);
+            border-radius: 14px;
+            margin-bottom: 0.9rem;
+            border-left: 4px solid var(--accent-red);
+        }
+
+        .task-item.completed {
+            opacity: 0.4;
+            border-left-color: var(--text-muted);
+            text-decoration: line-through;
+        }
+
+        .task-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .checkbox-custom {
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--accent-red);
+            border-radius: 7px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .task-item.completed .checkbox-custom {
+            background: var(--accent-red);
+        }
+
+        .checkbox-custom::after {
+            content: '✓';
+            color: white;
+            font-size: 13px;
+            display: none;
+            font-weight: bold;
+        }
+
+        .task-item.completed .checkbox-custom::after {
+            display: block;
+        }
+
+        .task-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tag {
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .tag-study { background: rgba(167, 139, 250, 0.15); color: #c084fc; }
+        .tag-health { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+        .tag-deen { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+        .tag-personal { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+
+        .btn-delete {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .btn-delete:hover { color: var(--accent-red); }
+
+        .empty-state { text-align: center; color: var(--text-muted); padding: 3.5rem 1rem; }
+    </style>
+</head>
+<body>
+
+    <div class="video-bg-container">
+        <video autoplay muted loop playsinline id="bg-video">
+            <source src="background.mp4." type="video/mp4">
+            <source src="./background.mp4" type="video/mp4">
+            <source src="background.mp4" type="video/mp4">
+        </video>
+    </div>
+    <div class="video-overlay"></div>
+
+    <div id="auth-screen">
+        <div class="auth-card">
+            <div class="auth-icon"><i class="fas fa-fire-alt"></i></div>
+            <div class="auth-title">WØRK HΛRD</div>
+            <div class="auth-subtitle">Whenever you lose motivation, study like Chinese students ✨</div>
+            <div class="input-group">
+                <input type="text" id="username-input" placeholder="Enter your handle..." autocomplete="off">
+            </div>
+            <button class="btn-primary" onclick="initializeWorkspace()">Initialize Workspace</button>
+        </div>
+    </div>
+
+    <div class="app-container" id="main-dashboard">
+        <header>
+            <div class="user-profile">
+                <div class="avatar" id="user-avatar">M</div>
+                <div>
+                    <h3 id="welcome-text">Mina's Workspace</h3>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); letter-spacing: 1px;">⚡ HOT GIRLS STUDY HARD</p>
+                </div>
+            </div>
+            <div style="font-size: 1.2rem; font-weight: bold; color: var(--accent-gold);">
+                <i class="fas fa-fire"></i> <span id="streak-counter">1</span> Days
+            </div>
+        </header>
+
+        <div class="analytics-card">
+            <div class="progress-circle-container">
+                <svg width="120" height="120" style="transform: rotate(-90deg);">
+                    <circle cx="60" cy="60" r="50" stroke="rgba(255,255,255,0.03)" stroke-width="8" fill="transparent"/>
+                    <circle id="progress-bar" cx="60" cy="60" r="50" stroke="var(--accent-red)" stroke-width="8" fill="transparent"
+                            stroke-dasharray="314" stroke-dashoffset="314" style="transition: stroke-dashoffset 0.4s ease;"/>
+                </svg>
+                <div class="progress-value" id="progress-percentage">0%</div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label">Completed</div>
+                    <div class="stat-number" id="stats-completed">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Remaining</div>
+                    <div class="stat-number" id="stats-remaining">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="creator-section">
+            <div class="task-input-row">
+                <input type="text" id="task-input" placeholder="Type a hard core objective...">
+                <select id="category-input" class="select-category">
+                    <option value="study">Study 📚</option>
+                    <option value="health">Health 💪</option>
+                    <option value="deen">Deen 🕌</option>
+                    <option value="personal">Personal ⚡</option>
+                </select>
+                <button class="btn-add" onclick="addTask()">Add Task</button>
+            </div>
+        </div>
+
+        <div class="filter-row">
+            <button class="filter-btn active" onclick="filterTasks('all', this)">All Items</button>
+            <button class="filter-btn" onclick="filterTasks('study', this)">Study 📚</button>
+            <button class="filter-btn" onclick="filterTasks('health', this)">Health 💪</button>
+            <button class="filter-btn" onclick="filterTasks('deen', this)">Deen 🕌</button>
+            <button class="filter-btn" onclick="filterTasks('personal', this)">Personal ⚡</button>
+        </div>
+
+        <div class="tasks-grid">
+            <div class="grid-title"><i class="fas fa-terminal"></i> Daily Execution Grid</div>
+            <div id="tasks-container"></div>
+        </div>
+    </div>
+
+    <script>
+        let tasks = JSON.parse(localStorage.getItem('hottie_tasks')) || [];
+        let currentFilter = 'all';
+        let currentUsername = localStorage.getItem('hottie_username') || '';
+
+        window.onload = function() {
+            if (currentUsername) {
+                document.getElementById('username-input').value = currentUsername;
+                // Agar foydalanuvchi tizimga kirgan bo'lsa, to'g'ridan-to'g'ri dashboardni ochish
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('main-dashboard').style.display = 'block';
+                document.getElementById('main-dashboard').style.opacity = '1';
+                setupDashboard();
+            } else {
+                document.getElementById('auth-screen').style.display = 'flex';
+                document.getElementById('main-dashboard').style.display = 'none';
+            }
+
+            // Brauzer bloklashini chetlab o'tib videoni ishga tushirish majburiy skripti
+            const video = document.getElementById('bg-video');
+            if(video) {
+                video.muted = true;
+                video.play().catch(err => console.log("Autoplay unblocked gesture handled."));
+            }
+        };
+
+        function initializeWorkspace() {
+            const input = document.getElementById('username-input').value.trim();
+            if (!input) return alert('Iltimos, ismingizni kiriting!');
+            
+            localStorage.setItem('hottie_username', input);
+            currentUsername = input;
+            
+            document.getElementById('auth-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('main-dashboard').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('main-dashboard').style.opacity = '1';
+                }, 50);
+                setupDashboard();
+            }, 500);
+
+            const video = document.getElementById('bg-video');
+            if(video) video.play().catch(e => console.log("Video core play invoked"));
+        }
+
+        function setupDashboard() {
+            document.getElementById('welcome-text').innerText = `${currentUsername}'s Workspace`;
+            document.getElementById('user-avatar').innerText = currentUsername.charAt(0).toUpperCase();
+            renderTasks();
+        }
+
+        function addTask() {
+            const textInput = document.getElementById('task-input');
+            const categoryInput = document.getElementById('category-input');
+            if (!textInput.value.trim()) return;
+
+            const newTask = {
+                id: Date.now(),
+                text: textInput.value.trim(),
+                category: categoryInput.value,
+                completed: false,
+                date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+
+            tasks.push(newTask);
+            textInput.value = '';
+            saveAndRefresh();
+        }
+
+        function toggleTask(id) {
+            tasks = tasks.map(t => t.id === id ? {...t, completed: !t.completed} : t);
+            saveAndRefresh();
+        }
+
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            saveAndRefresh();
+        }
+
+        function filterTasks(category, element) {
+            currentFilter = category;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            renderTasks();
+        }
+
+        function saveAndRefresh() {
+            localStorage.setItem('hottie_tasks', JSON.stringify(tasks));
+            renderTasks();
+        }
+
+        function renderTasks() {
+            const container = document.getElementById('tasks-container');
+            container.innerHTML = '';
+            const filtered = tasks.filter(t => currentFilter === 'all' || t.category === currentFilter);
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="empty-state">No active objectives match the current category filter view model. Add a hard core goal!</div>`;
+                updateAnalytics(0, 0);
+                return;
+            }
+
+            filtered.forEach(task => {
+                const item = document.createElement('div');
+                item.className = `task-item ${task.completed ? 'completed' : ''}`;
+                item.innerHTML = `
+                    <div class="task-left">
+                        <div class="checkbox-custom" onclick="toggleTask(${task.id})"></div>
+                        <div>
+                            <div>${task.text}</div>
+                            <div class="task-meta">
+                                <span class="tag tag-${task.category}">${task.category}</span>
+                                <span><i class="far fa-clock"></i> ${task.date}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-delete" onclick="deleteTask(${task.id})"><i class="fas fa-trash-alt"></i></button>
+                `;
+                container.appendChild(item);
+            });
+
+            const completedCount = tasks.filter(t => t.completed).length;
+            const totalCount = tasks.length;
+            updateAnalytics(completedCount, totalCount);
+        }
+
+        function updateAnalytics(completed, total) {
+            const remaining = total - completed;
+            const percentage = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+            document.getElementById('stats-completed').innerText = completed;
+            document.getElementById('stats-remaining').innerText = remaining;
+            document.getElementById('progress-percentage').innerText = `${percentage}%`;
+
+            const circle = document.getElementById('progress-bar');
+            const circumference = 2 * Math.PI * 50;
+            const offset = circumference - (percentage / 100) * circumference;
+            circle.style.strokeDashoffset = offset;
+        }
+    </script>
+</body>
+</html>
